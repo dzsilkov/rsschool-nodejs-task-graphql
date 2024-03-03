@@ -23,10 +23,10 @@ export const createGqlResponseSchema = {
 
 export const gqlSchema = new GraphQLSchema({
     query: new GraphQLObjectType<any, any>({
-        name: 'root',
+        name: 'Root',
         fields: {
             memberTypes: {
-                type: new GraphQLList(MemberType)
+                type: new GraphQLList(MemberType),
             }
         }
     })
