@@ -1,9 +1,9 @@
-import { PrismaClient } from '@prisma/client';
-import { MemberType, Post, Profile, User } from '../models/models.js';
+import {PrismaClient} from '@prisma/client';
+import {MemberType, Post, Profile, User} from '../models/models.js';
 
 export async function loadMemberTypes(memberTypeIds: string[], prisma: PrismaClient,): Promise<MemberType[]> {
     const memberTypes = await prisma.memberType.findMany({
-        where: { id: { in: memberTypeIds } },
+        where: {id: {in: memberTypeIds}},
     });
 
     const memberTypeMap: { [id: string]: MemberType } = {};
@@ -14,11 +14,28 @@ export async function loadMemberTypes(memberTypeIds: string[], prisma: PrismaCli
     return memberTypeIds.map((id) => memberTypeMap[id]);
 }
 
+export async function loadUsers(userIds: string[], prisma: PrismaClient,): Promise<User[]> {
+    const users = await prisma.user.findMany({
+        where: {id: {in: userIds}},
+        include: {
+            userSubscribedTo: true,
+            subscribedToUser: true,
+        }
+    });
+
+    const usersMap: { [id: string]: User } = {};
+    users.forEach((user) => {
+        usersMap[user.id] = user;
+    });
+
+    return userIds.map((id) => usersMap[id]);
+}
+
 export async function loadPosts(
     authorIds: string[],
     prisma: PrismaClient,
 ): Promise<Post[][]> {
-    const posts = await prisma.post.findMany({ where: { authorId: { in: authorIds } } });
+    const posts = await prisma.post.findMany({where: {authorId: {in: authorIds}}});
 
     const postsByAuthorMap: { [authorId: string]: Post[] } = {};
 
@@ -37,7 +54,7 @@ export async function loadProfiles(
     prisma: PrismaClient,
 ): Promise<Profile[]> {
     const profiles = await prisma.profile.findMany({
-        where: { userId: { in: userIds } },
+        where: {userId: {in: userIds}},
     });
 
     const profilesMap: { [id: string]: Profile } = {};
@@ -53,8 +70,8 @@ export async function loadSubscribers(
     prisma: PrismaClient,
 ): Promise<User[][]> {
     const users = await prisma.user.findMany({
-        where: { userSubscribedTo: { some: { authorId: { in: authorIds } } } },
-        include: { userSubscribedTo: true },
+        where: {userSubscribedTo: {some: {authorId: {in: authorIds}}}},
+        include: {userSubscribedTo: true},
     });
 
     const usersMap: { [id: string]: User[] } = {};
@@ -76,8 +93,8 @@ export async function loadSubscriptions(
     prisma: PrismaClient,
 ): Promise<User[][]> {
     const users = await prisma.user.findMany({
-        where: { subscribedToUser: { some: { subscriberId: { in: subscriberIds } } } },
-        include: { subscribedToUser: true },
+        where: {subscribedToUser: {some: {subscriberId: {in: subscriberIds}}}},
+        include: {subscribedToUser: true},
     });
 
     const usersMap: { [id: string]: User[] } = {};

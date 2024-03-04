@@ -3,6 +3,7 @@ import {GraphQLFloat, GraphQLInputObjectType, GraphQLList, GraphQLObjectType, Gr
 import {ProfileType} from './profile.js';
 import {PostType} from './post.js';
 import {Context} from '../models/context.js';
+import {User} from '../models/models.js';
 
 interface SourceId {
     id: string;
@@ -16,19 +17,31 @@ export const UserType = new GraphQLObjectType({
         balance: {type: GraphQLFloat},
         profile: {
             type: ProfileType,
-            resolve: (source: SourceId, _args, context: Context) => context.profileLoader.load(source.id)
+            resolve: (source: User, _args, context: Context) => context.profileLoader.load(source.id)
         },
         posts: {
             type: new GraphQLList(PostType),
-            resolve: (source: SourceId, _args, context: Context) => context.postLoader.load(source.id)
+            resolve: (source: User, _args, context: Context) => context.postLoader.load(source.id)
         },
         subscribedToUser: {
             type: new GraphQLList(UserType),
-            resolve: (source: SourceId, _args, context: Context) => context.subscribersLoader.load(source.id)
+            resolve: (source: User, _args, context: Context) => {
+                if (!source.subscribedToUser) {
+                    return [];
+                }
+                const subscriberIds = source.subscribedToUser.map(({subscriberId}) => subscriberId);
+                return context.userLoader.loadMany(subscriberIds);
+            }
         },
         userSubscribedTo: {
             type: new GraphQLList(UserType),
-            resolve: (source: SourceId, _args, context: Context) => context.subscriptionsLoader.load(source.id)
+            resolve: (source: User, _args, context: Context) => {
+                if (!source.userSubscribedTo) {
+                    return [];
+                }
+                const authorIds = source.userSubscribedTo.map(({authorId}) => authorId);
+                return context.userLoader.loadMany(authorIds);
+            }
         }
     }),
 });

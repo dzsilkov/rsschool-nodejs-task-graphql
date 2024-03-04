@@ -16,8 +16,23 @@ export type Profile = {
     yearOfBirth: number;
 };
 
+type SubscribedToUser = {
+    subscriberId: string;
+};
+
+type UserSubscribedTo = {
+    authorId: string;
+};
+
 export type User = {
     id: string;
     name: string;
     balance: number;
+    subscribedToUser?: SubscribedToUser[];
+    userSubscribedTo?: UserSubscribedTo[];
+};
+
+export type PrismaQueryUsersIncludeArgs = {
+    userSubscribedTo?: true;
+    subscribedToUser?: true;
 };

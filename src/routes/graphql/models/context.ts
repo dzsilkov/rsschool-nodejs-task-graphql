@@ -8,8 +8,7 @@ export interface Context {
     prisma: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>;
     httpErrors: HttpErrors;
     memberTypeLoader: DataLoader<string, MemberType, string>;
+    userLoader: DataLoader<string, User, string>;
     postLoader: DataLoader<string, Post[], string>;
     profileLoader: DataLoader<string, Profile, string>;
-    subscribersLoader: DataLoader<string, User[], string>;
-    subscriptionsLoader: DataLoader<string, User[], string>;
 }

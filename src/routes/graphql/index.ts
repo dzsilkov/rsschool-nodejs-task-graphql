@@ -5,7 +5,14 @@ import depthLimit from 'graphql-depth-limit';
 import {gqlSchema} from './gql-schema/gql-scheme.js';
 import DataLoader from 'dataloader';
 import {MemberType, Post, Profile, User} from './models/models.js';
-import {loadMemberTypes, loadPosts, loadProfiles, loadSubscribers, loadSubscriptions} from './loaders/loaders.js';
+import {
+    loadMemberTypes,
+    loadPosts,
+    loadProfiles,
+    loadSubscribers,
+    loadSubscriptions,
+    loadUsers
+} from './loaders/loaders.js';
 
 const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
     const {prisma, httpErrors} = fastify;
@@ -36,17 +43,14 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
                     memberTypeLoader: new DataLoader<string, MemberType>(async (memberTypeIds) =>
                         loadMemberTypes([...memberTypeIds], prisma),
                     ),
+                    userLoader: new DataLoader<string, User>(async (userIds) =>
+                        loadUsers([...userIds], prisma),
+                    ),
                     postLoader: new DataLoader<string, Post[]>(async (authorIds) =>
                         loadPosts([...authorIds], prisma),
                     ),
                     profileLoader: new DataLoader<string, Profile>(async (userIds) =>
                         loadProfiles([...userIds], prisma),
-                    ),
-                    subscribersLoader: new DataLoader<string, User[]>(async (userIds) =>
-                        loadSubscribers([...userIds], prisma),
-                    ),
-                    subscriptionsLoader: new DataLoader<string, User[]>(async (userIds) =>
-                        loadSubscriptions([...userIds], prisma),
                     ),
                 },
                 source,
