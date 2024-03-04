@@ -1,9 +1,9 @@
 import {PrismaClient} from '@prisma/client';
 import {MemberType, Post, Profile, User} from '../models/models.js';
 
-export async function loadMemberTypes(memberTypeIds: string[], prisma: PrismaClient,): Promise<MemberType[]> {
+export async function loadMemberTypes(ids: string[], prisma: PrismaClient,): Promise<MemberType[]> {
     const memberTypes = await prisma.memberType.findMany({
-        where: {id: {in: memberTypeIds}},
+        where: {id: {in: ids}},
     });
 
     const memberTypeMap: { [id: string]: MemberType } = {};
@@ -11,12 +11,12 @@ export async function loadMemberTypes(memberTypeIds: string[], prisma: PrismaCli
         memberTypeMap[memberType.id] = memberType;
     });
 
-    return memberTypeIds.map((id) => memberTypeMap[id]);
+    return ids.map((id) => memberTypeMap[id]);
 }
 
-export async function loadUsers(userIds: string[], prisma: PrismaClient,): Promise<User[]> {
+export async function loadUsers(ids: string[], prisma: PrismaClient,): Promise<User[]> {
     const users = await prisma.user.findMany({
-        where: {id: {in: userIds}},
+        where: {id: {in: ids}},
         include: {
             userSubscribedTo: true,
             subscribedToUser: true,
@@ -28,14 +28,14 @@ export async function loadUsers(userIds: string[], prisma: PrismaClient,): Promi
         usersMap[user.id] = user;
     });
 
-    return userIds.map((id) => usersMap[id]);
+    return ids.map((userId) => usersMap[userId]);
 }
 
 export async function loadPosts(
-    authorIds: string[],
+    ids: string[],
     prisma: PrismaClient,
 ): Promise<Post[][]> {
-    const posts = await prisma.post.findMany({where: {authorId: {in: authorIds}}});
+    const posts = await prisma.post.findMany({where: {authorId: {in: ids}}});
 
     const postsByAuthorMap: { [authorId: string]: Post[] } = {};
 
@@ -46,15 +46,15 @@ export async function loadPosts(
         postsByAuthorMap[post.authorId].push(post);
     });
 
-    return authorIds.map((authorId) => postsByAuthorMap[authorId] || []);
+    return ids.map((authorId) => postsByAuthorMap[authorId] || []);
 }
 
 export async function loadProfiles(
-    userIds: string[],
+    ids: string[],
     prisma: PrismaClient,
 ): Promise<Profile[]> {
     const profiles = await prisma.profile.findMany({
-        where: {userId: {in: userIds}},
+        where: {userId: {in: ids}},
     });
 
     const profilesMap: { [id: string]: Profile } = {};
@@ -62,71 +62,5 @@ export async function loadProfiles(
         profilesMap[profile.userId] = profile;
     });
 
-    return userIds.map((id) => profilesMap[id]);
+    return ids.map((id) => profilesMap[id]);
 }
-
-export async function loadSubscribers(
-    authorIds: string[],
-    prisma: PrismaClient,
-): Promise<User[][]> {
-    const users = await prisma.user.findMany({
-        where: {userSubscribedTo: {some: {authorId: {in: authorIds}}}},
-        include: {userSubscribedTo: true},
-    });
-
-    const usersMap: { [id: string]: User[] } = {};
-
-    users.forEach((user) => {
-        user.userSubscribedTo.forEach((userSubscribedTo) => {
-            if (!usersMap[userSubscribedTo.authorId]) {
-                usersMap[userSubscribedTo.authorId] = [];
-            }
-            usersMap[userSubscribedTo.authorId].push(user);
-        });
-    });
-
-    return authorIds.map((authorId) => usersMap[authorId] ?? []);
-}
-
-export async function loadSubscriptions(
-    subscriberIds: string[],
-    prisma: PrismaClient,
-): Promise<User[][]> {
-    const users = await prisma.user.findMany({
-        where: {subscribedToUser: {some: {subscriberId: {in: subscriberIds}}}},
-        include: {subscribedToUser: true},
-    });
-
-    const usersMap: { [id: string]: User[] } = {};
-
-    users.forEach((user) => {
-        user.subscribedToUser.forEach((subscribedToUser) => {
-            if (!usersMap[subscribedToUser.subscriberId]) {
-                usersMap[subscribedToUser.subscriberId] = [];
-            }
-            usersMap[subscribedToUser.subscriberId].push(user);
-        });
-    });
-
-    return subscriberIds.map((subscriberId) => usersMap[subscriberId] ?? []);
-}
-
-// const memberTypeLoader = new DataLoader<string, MemberType>(async (memberTypeIds) =>
-//     loadMemberTypes([...memberTypeIds], prisma),
-// );
-//
-// const postLoader = new DataLoader<string, Post[]>(async (authorIds) =>
-//     loadPosts([...authorIds], prisma),
-// );
-//
-// const profileLoader = new DataLoader<string, Profile>(async (userIds) =>
-//     loadProfiles([...userIds], prisma),
-// );
-//
-// const subscribersLoader = new DataLoader<string, User[]>(async (userIds) =>
-//     loadSubscribers([...userIds], prisma),
-// );
-//
-// const subscriptionsLoader = new DataLoader<string, User[]>(async (userIds) =>
-//     loadSubscriptions([...userIds], prisma),
-// );

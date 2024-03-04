@@ -5,11 +5,7 @@ import {PostType} from './post.js';
 import {Context} from '../models/context.js';
 import {User} from '../models/models.js';
 
-interface SourceId {
-    id: string;
-}
-
-export const UserType = new GraphQLObjectType({
+export const UserType: GraphQLObjectType = new GraphQLObjectType({
     name: 'User',
     fields: () => ({
         id: {type: UUIDType},
@@ -17,29 +13,29 @@ export const UserType = new GraphQLObjectType({
         balance: {type: GraphQLFloat},
         profile: {
             type: ProfileType,
-            resolve: (source: User, _args, context: Context) => context.profileLoader.load(source.id)
+            resolve: ({id}: User, _args, context: Context) => context.profileLoader.load(id)
         },
         posts: {
             type: new GraphQLList(PostType),
-            resolve: (source: User, _args, context: Context) => context.postLoader.load(source.id)
+            resolve: ({id}: User, _args, context: Context) => context.postLoader.load(id)
         },
         subscribedToUser: {
             type: new GraphQLList(UserType),
-            resolve: (source: User, _args, context: Context) => {
-                if (!source.subscribedToUser) {
+            resolve: ({subscribedToUser}: User, _args, context: Context) => {
+                if (!subscribedToUser) {
                     return [];
                 }
-                const subscriberIds = source.subscribedToUser.map(({subscriberId}) => subscriberId);
+                const subscriberIds = subscribedToUser.map(({subscriberId}) => subscriberId);
                 return context.userLoader.loadMany(subscriberIds);
             }
         },
         userSubscribedTo: {
             type: new GraphQLList(UserType),
-            resolve: (source: User, _args, context: Context) => {
-                if (!source.userSubscribedTo) {
+            resolve: ({userSubscribedTo}: User, _args, context: Context) => {
+                if (!userSubscribedTo) {
                     return [];
                 }
-                const authorIds = source.userSubscribedTo.map(({authorId}) => authorId);
+                const authorIds = userSubscribedTo.map(({authorId}) => authorId);
                 return context.userLoader.loadMany(authorIds);
             }
         }
