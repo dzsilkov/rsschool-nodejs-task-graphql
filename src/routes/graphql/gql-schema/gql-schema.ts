@@ -24,10 +24,10 @@ export const gqlSchema = new GraphQLSchema({
     }),
     mutation: new GraphQLObjectType({
         name: 'RootMutation',
-        fields: () => ({
+        fields: {
             ...userMutations,
             ...profileMutations,
             ...postMutations
-        }),
+        },
     })
 });

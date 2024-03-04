@@ -1,4 +1,4 @@
-import {MemberType, MemberTypeEnumId} from '../../types/member-type.js';
+import {MemberType, MemberTypeId} from '../../types/member-type.js';
 import {GraphQLList, GraphQLNonNull} from 'graphql/index.js';
 import {Context} from '../../models/context.js';
 
@@ -11,7 +11,7 @@ export const memberTypeQuery = {
         type: MemberType,
         args: {
             id: {
-                type: new GraphQLNonNull(MemberTypeEnumId),
+                type: new GraphQLNonNull(MemberTypeId),
             },
         },
         resolve: async (_source, {id}: { id: string }, context: Context) =>

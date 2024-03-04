@@ -1,5 +1,5 @@
 import {ChangeUserInput, CreateUserInput, UserType} from '../../types/user.js';
-import {GraphQLNonNull, GraphQLString} from 'graphql/index.js';
+import {GraphQLNonNull} from 'graphql/index.js';
 import {UUIDType} from '../../types/uuid.js';
 import {ChangeUserDto, CreateUserDto, SubscribeDto} from '../../models/models.js';
 import {Context} from '../../models/context.js';

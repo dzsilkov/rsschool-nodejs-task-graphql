@@ -1,7 +1,8 @@
 import {PrismaClient} from '@prisma/client';
 import {MemberType, Post, Profile, User} from '../models/models.js';
+import DataLoader from 'dataloader';
 
-export async function loadMemberTypes(ids: string[], prisma: PrismaClient,): Promise<MemberType[]> {
+async function loadMemberTypes(ids: string[], prisma: PrismaClient,): Promise<MemberType[]> {
     const memberTypes = await prisma.memberType.findMany({
         where: {id: {in: ids}},
     });
@@ -14,7 +15,7 @@ export async function loadMemberTypes(ids: string[], prisma: PrismaClient,): Pro
     return ids.map((id) => memberTypeMap[id]);
 }
 
-export async function loadUsers(ids: string[], prisma: PrismaClient,): Promise<User[]> {
+async function loadUsers(ids: string[], prisma: PrismaClient,): Promise<User[]> {
     const users = await prisma.user.findMany({
         where: {id: {in: ids}},
         include: {
@@ -31,7 +32,7 @@ export async function loadUsers(ids: string[], prisma: PrismaClient,): Promise<U
     return ids.map((userId) => usersMap[userId]);
 }
 
-export async function loadPosts(
+async function loadPosts(
     ids: string[],
     prisma: PrismaClient,
 ): Promise<Post[][]> {
@@ -49,7 +50,7 @@ export async function loadPosts(
     return ids.map((authorId) => postsByAuthorMap[authorId] || []);
 }
 
-export async function loadProfiles(
+async function loadProfiles(
     ids: string[],
     prisma: PrismaClient,
 ): Promise<Profile[]> {
@@ -64,3 +65,23 @@ export async function loadProfiles(
 
     return ids.map((id) => profilesMap[id]);
 }
+
+export const userLoader = (prisma: PrismaClient) =>
+    new DataLoader<string, User>(async (userIds) =>
+        loadUsers([...userIds], prisma),
+    );
+
+export const memberTypeLoader = (prisma: PrismaClient) =>
+    new DataLoader<string, MemberType>(async (memberTypeIds) =>
+        loadMemberTypes([...memberTypeIds], prisma),
+    );
+
+export const postLoader = (prisma: PrismaClient) =>
+    new DataLoader<string, Post[]>(async (authorIds) =>
+        loadPosts([...authorIds], prisma),
+    );
+
+export const profileLoader = (prisma: PrismaClient) =>
+    new DataLoader<string, Profile>(async (userIds) =>
+        loadProfiles([...userIds], prisma),
+    );

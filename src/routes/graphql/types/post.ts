@@ -12,7 +12,7 @@ export const PostType: GraphQLObjectType = new GraphQLObjectType({
 });
 
 export const CreatePostInput = new GraphQLInputObjectType({
-    name: 'CreatePost',
+    name: 'CreatePostInput',
     fields: () => ({
         authorId: {type: UUIDType},
         title: {type: GraphQLString},
@@ -21,7 +21,7 @@ export const CreatePostInput = new GraphQLInputObjectType({
 });
 
 export const ChangePostInput = new GraphQLInputObjectType({
-    name: 'ChangePost',
+    name: 'ChangePostInput',
     fields: () => ({
         title: {type: GraphQLString},
         content: {type: GraphQLString},

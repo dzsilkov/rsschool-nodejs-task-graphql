@@ -1,5 +1,5 @@
 import {ChangePostInput, CreatePostInput, PostType} from '../../types/post.js';
-import {GraphQLNonNull, GraphQLString} from 'graphql/index.js';
+import {GraphQLNonNull} from 'graphql/index.js';
 import {ChangePostDto, CreatePostDto} from '../../models/models.js';
 import {Context} from '../../models/context.js';
 import {UUIDType} from '../../types/uuid.js';

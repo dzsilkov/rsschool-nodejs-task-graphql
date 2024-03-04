@@ -1,5 +1,5 @@
 import {ChangeProfileInput, CreateProfileInput, ProfileType} from '../../types/profile.js';
-import {GraphQLNonNull, GraphQLString} from 'graphql/index.js';
+import {GraphQLNonNull} from 'graphql/index.js';
 import {UUIDType} from '../../types/uuid.js';
 import {ChangeProfileDto, CreateProfileDto} from '../../models/models.js';
 import {Context} from '../../models/context.js';
