@@ -1,7 +1,7 @@
 import {UUIDType} from './uuid.js';
-import {GraphQLFloat, GraphQLList, GraphQLObjectType, GraphQLString} from 'graphql';
+import {GraphQLFloat, GraphQLInputObjectType, GraphQLList, GraphQLObjectType, GraphQLString} from 'graphql';
 import {ProfileType} from './profile.js';
-import {PostType} from './post.js';
+import {ChangePostInput, PostType} from './post.js';
 import {Context} from './context.js';
 
 interface SourceId {
@@ -43,4 +43,20 @@ export const UserType = new GraphQLObjectType({
                 })
         }
     }),
+});
+
+export const CreateUserInput = new GraphQLInputObjectType({
+    name: 'CreateUser',
+    fields: () => ({
+        name: {type: UUIDType},
+        balance: {type: GraphQLFloat}
+    })
+});
+
+export const ChangeUserInput = new GraphQLInputObjectType({
+    name: 'ChangeUser',
+    fields: () => ({
+        name: {type: GraphQLString},
+        balance: {type: GraphQLFloat}
+    })
 });
